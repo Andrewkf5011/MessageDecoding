@@ -1,26 +1,68 @@
 #include <mbed.h>
-#include "LED.h"
-#include "AssignmentBoard.h"
+#include "Decoder.h"
 
-AssignmentBoard board;
+//[name] These are the IDs of all the different LEDs.
+char *name[] = {"red","green","blue"};
 
-LED light[] = {
-  LED(board.K64F_RED_LED),
-  LED(board.K64F_GREEN_LED),
-  LED(board.K64F_BLUE_LED),
-  LED(board.SHIELD_RED_LED),
-  LED(board.SHIELD_GREEN_LED),
-  LED(board.SHIELD_BLUE_LED)
+//[LED] These are all the different LEDs.
+DigitalOut LED[] =
+{
+    /* initialise to 1==off */
+    DigitalOut(LED_RED,1),
+    DigitalOut(LED_GREEN,1),
+    DigitalOut(LED_BLUE,1)
 };
 
-int main() {
+/**
+ * @brief Sets an LED.
+ */
+void setLED(char *which, char *state)
+{
+    //[id] The ID of the LED.
+    int id;
 
-    while(1) {
-      int k;
-      for( k=0 ; k<6 ; k++){
-        light[k].on();
-        wait(0.5);
-        light[k].off();
-      }
+    //[logic] The state to set the LED.
+    int logic;
+
+    //Check which LED to set.
+    for(id=0; id<3; id++)
+    {
+        /* test for name match */
+        if(strcmp(which, name[id])==0)
+        {
+            break; /* exit loop with current id */
+        }
+    }
+
+    //Turn the LED on.
+    if(strcmp(state,"on") == 0)
+    {
+        logic = 0;
+    }
+    //Turn the LED off.
+    if(strcmp(state,"off") == 0)
+    {
+        logic = 1;
+    }
+
+    //Set the state of the LED.
+    LED[id].write(logic);
+
+    printf("led %d at %d \n", id, logic);
+}
+
+int main()
+{
+    Decoder decoder;
+
+    //Decode the message.
+    decoder.decodeMessage("blue:on\n");
+
+    //Do something with the message.
+    setLED((char*)decoder.getKey().c_str(), (char*)decoder.getValue().c_str());
+
+    while(1)
+    {
+
     }
 }
